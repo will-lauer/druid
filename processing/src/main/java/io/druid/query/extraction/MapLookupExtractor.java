@@ -43,12 +43,16 @@ public class MapLookupExtractor extends LookupExtractor
 {
   private final Map<String, String> map;
 
+  private final boolean isOneToOne;
+
   @JsonCreator
   public MapLookupExtractor(
-      @JsonProperty("map") Map<String, String> map
+      @JsonProperty("map") Map<String, String> map,
+      @JsonProperty("isOneToOne") boolean isOneToOne
   )
   {
     this.map = Preconditions.checkNotNull(map, "map");
+    this.isOneToOne = isOneToOne;
   }
 
   @JsonProperty
@@ -75,6 +79,13 @@ public class MapLookupExtractor extends LookupExtractor
       }
     }).keySet());
 
+  }
+
+  @Override
+  @JsonProperty
+  public boolean isOneToOne()
+  {
+    return isOneToOne;
   }
 
   @Override
@@ -121,5 +132,11 @@ public class MapLookupExtractor extends LookupExtractor
   public int hashCode()
   {
     return map.hashCode();
+  }
+
+  @Override
+  public void close() throws IOException
+  {
+    //Noop
   }
 }

@@ -29,6 +29,7 @@ import com.google.inject.name.Named;
 import com.metamx.common.StringUtils;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -86,5 +87,11 @@ public class NamespacedExtractor extends LookupExtractor
   public List<String> unapply(@NotNull String value)
   {
     return reverseExtractionFunction.apply(value);
+  }
+
+  @Override
+  public void close() throws IOException
+  {
+    //noop
   }
 }

@@ -25,16 +25,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.io.Closeable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = LookupDelegator.class)
 @JsonSubTypes(value = {
-    @JsonSubTypes.Type(name = "map", value = MapLookupExtractor.class)
+    @JsonSubTypes.Type(name = "map", value = MapLookupExtractor.class),
+    @JsonSubTypes.Type(name = "registered", value = LookupDelegator.class)
 })
-public abstract class LookupExtractor
+public abstract class LookupExtractor implements Closeable
 {
   /**
    * Apply a particular lookup methodology to the input string
@@ -106,6 +108,10 @@ public abstract class LookupExtractor
    * @return A byte array that can be used to uniquely identify if results of a prior lookup can use the cached values
    */
 
-  @Nullable
   public abstract byte[] getCacheKey();
+
+  public boolean isOneToOne()
+  {
+    return false;
+  }
 }
