@@ -22,6 +22,7 @@ package io.druid.query.extraction;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.metamx.common.ISE;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
@@ -29,6 +30,7 @@ import com.metamx.common.logger.Logger;
 import io.druid.guice.ManageLifecycle;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -77,9 +79,9 @@ public class LookupReferencesManager
    *
    * @return true if the lookup is added otherwise false.
    *
-   * @throws ISE If the manager is closed or if start of lookup returns false.
+   * @throws IllegalStateException If the manager is closed or if start of lookup returns false.
    */
-  public boolean put(String lookupName, final LookupExtractorFactory lookupExtractorFactory) throws ISE
+  public boolean put(String lookupName, final LookupExtractorFactory lookupExtractorFactory)
   {
     synchronized (lock) {
       assertStarted();
@@ -91,11 +93,11 @@ public class LookupReferencesManager
   }
 
   /**
-   * @param lookups {@link ImmutableMap<String, LookupExtractorFactory>} containing all the lookup as one batch.
+   * @param lookups {@link Map<String, LookupExtractorFactory>} containing all the lookup as one batch.
    *
-   * @throws ISE if the manager is closed or if {@link LookupExtractorFactory#start()} returns false
+   * @throws IllegalStateException if the manager is closed or if {@link LookupExtractorFactory#start()} returns false
    */
-  public void put(ImmutableMap<String, LookupExtractorFactory> lookups) throws ISE
+  public void put(Map<String, LookupExtractorFactory> lookups)
   {
     synchronized (lock) {
       assertStarted();
@@ -114,7 +116,7 @@ public class LookupReferencesManager
 
   /**
    * @param lookupName namespace of {@link LookupExtractor} to delete from the reference registry.
-   *                   this function does call the cleaning method {@link LookupExtractor#close()}
+   *                   this function does call the cleaning method {@link LookupExtractorFactory#stop()}
    *
    * @return true only if {@code lookupName} is removed and the lookup correctly stopped
    */
@@ -133,10 +135,10 @@ public class LookupReferencesManager
    *
    * @return reference of {@link LookupExtractor} that correspond the the namespace {@code lookupName} or null if absent
    *
-   * @throws ISE if the {@link LookupReferencesManager} is closed or did not start yet
+   * @throws IllegalStateException if the {@link LookupReferencesManager} is closed or did not start yet
    */
   @Nullable
-  public LookupExtractorFactory get(String lookupName) throws ISE
+  public LookupExtractorFactory get(String lookupName)
   {
     final LookupExtractorFactory lookupExtractorFactory = lookupMap.get(lookupName);
     assertStarted();
@@ -144,14 +146,14 @@ public class LookupReferencesManager
   }
 
   /**
-   * @return Returns {@link ImmutableMap} containing a copy of the current state.
+   * @return Returns {@link Map} containing a copy of the current state.
    *
    * @throws ISE if the is is closed or did not start yet.
    */
-  public ImmutableMap<String, LookupExtractorFactory> getAll() throws ISE
+  public Map<String, LookupExtractorFactory> getAll() throws ISE
   {
     assertStarted();
-    return ImmutableMap.copyOf(lookupMap);
+    return Maps.newHashMap(lookupMap);
   }
 
   private void assertStarted() throws ISE
@@ -161,8 +163,7 @@ public class LookupReferencesManager
     }
   }
 
-  @VisibleForTesting
-  protected boolean isClosed()
+  public boolean isClosed()
   {
     return !started.get();
   }
