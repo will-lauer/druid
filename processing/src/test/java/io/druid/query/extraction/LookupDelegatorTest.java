@@ -111,12 +111,4 @@ public class LookupDelegatorTest
     EasyMock.replay(mockLookup);
     Assert.assertEquals(Collections.EMPTY_MAP, lookupExtractor.unapplyAll(Arrays.asList("key")));
   }
-
-  @Test
-  public void testClose() throws IOException
-  {
-    mockLookup.close();
-    EasyMock.expectLastCall();
-    lookupExtractor.close();
-  }
 }

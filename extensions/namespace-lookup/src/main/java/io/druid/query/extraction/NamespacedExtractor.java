@@ -89,9 +89,4 @@ public class NamespacedExtractor extends LookupExtractor
     return reverseExtractionFunction.apply(value);
   }
 
-  @Override
-  public void close() throws IOException
-  {
-    //noop
-  }
 }

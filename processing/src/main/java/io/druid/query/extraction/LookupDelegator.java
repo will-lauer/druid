@@ -91,12 +91,6 @@ public class LookupDelegator extends LookupExtractor
   }
 
   @Override
-  public void close() throws IOException
-  {
-    delegate.close();
-  }
-
-  @Override
   public boolean equals(Object o)
   {
     if (this == o) {

@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.io.Closeable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.Map;
     @JsonSubTypes.Type(name = "map", value = MapLookupExtractor.class),
     @JsonSubTypes.Type(name = "registered", value = LookupDelegator.class)
 })
-public abstract class LookupExtractor implements Closeable
+public abstract class LookupExtractor
 {
   /**
    * Apply a particular lookup methodology to the input string

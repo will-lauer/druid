@@ -134,9 +134,4 @@ public class MapLookupExtractor extends LookupExtractor
     return map.hashCode();
   }
 
-  @Override
-  public void close() throws IOException
-  {
-    //Noop
-  }
 }
