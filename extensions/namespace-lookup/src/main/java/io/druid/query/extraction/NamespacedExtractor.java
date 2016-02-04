@@ -29,7 +29,6 @@ import com.google.inject.name.Named;
 import com.metamx.common.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 

@@ -109,6 +109,7 @@ public abstract class LookupExtractor
 
   public abstract byte[] getCacheKey();
 
+  // make this abstract again once @drcrallen fix the metmax lookup implementation.
   public boolean isOneToOne()
   {
     return false;
