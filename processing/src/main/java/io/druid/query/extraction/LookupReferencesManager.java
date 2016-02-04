@@ -101,7 +101,7 @@ public class LookupReferencesManager
   {
     synchronized (lock) {
       assertStarted();
-      for (ImmutableMap.Entry<String, LookupExtractorFactory> entry : lookups.entrySet()) {
+      for (Map.Entry<String, LookupExtractorFactory> entry : lookups.entrySet()) {
         final String lookupName = entry.getKey();
         final LookupExtractorFactory lookupExtractorFactory = entry.getValue();
         if (!lookupExtractorFactory.start()) {
