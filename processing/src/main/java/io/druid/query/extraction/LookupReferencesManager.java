@@ -30,6 +30,7 @@ import com.metamx.common.logger.Logger;
 import io.druid.guice.ManageLifecycle;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -85,6 +86,10 @@ public class LookupReferencesManager
   {
     synchronized (lock) {
       assertStarted();
+      if (lookupMap.containsKey(lookupName)) {
+        LOGGER.warn("lookup is not add since namespace [%s] already exist", lookupName);
+        return false;
+      }
       if (!lookupExtractorFactory.start()) {
         throw new ISE("start method returned false for lookup [%s]", lookupName);
       }
@@ -99,17 +104,26 @@ public class LookupReferencesManager
    */
   public void put(Map<String, LookupExtractorFactory> lookups)
   {
+    Map<String, LookupExtractorFactory> faildExtractorFactoryMap = new HashMap<>();
     synchronized (lock) {
       assertStarted();
       for (Map.Entry<String, LookupExtractorFactory> entry : lookups.entrySet()) {
         final String lookupName = entry.getKey();
         final LookupExtractorFactory lookupExtractorFactory = entry.getValue();
+        if (lookupMap.containsKey(lookupName)) {
+          LOGGER.warn("lookup is not add since namespace [%s] already exist", lookupName);
+          continue;
+        }
         if (!lookupExtractorFactory.start()) {
-          throw new ISE("start method returned false for lookup [%s]", lookupName);
+          faildExtractorFactoryMap.put(lookupName, lookupExtractorFactory);
+          continue;
         }
         if (null != lookupMap.putIfAbsent(lookupName, lookupExtractorFactory)) {
-          LOGGER.warn("lookup with name [%s] is not add since it already exist", lookupName);
+          LOGGER.warn("lookup is not add since namespace [%s] already exist", lookupName);
         }
+      }
+      if (!faildExtractorFactoryMap.isEmpty()) {
+        throw new ISE("was not able to start the following lookup(s) [%s]", faildExtractorFactoryMap.keySet().toString());
       }
     }
   }
